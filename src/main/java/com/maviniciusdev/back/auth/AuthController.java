@@ -40,6 +40,7 @@ public class AuthController {
                 response.put("token", token);
                 response.put("firstName", user.getFirstName());
                 response.put("lastName", user.getLastName());
+                response.put("role", user.getAppUserRole().name());
             } else {
                 response.put("authenticated", false);
                 response.put("message", !user.isEnabled() ?

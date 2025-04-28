@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>SCEA – Cadastro</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <!-- Loader global -->
+  <div id="loader" class="loader-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="container">
+    <div class="left-panel">
+      <img src="../img/UCSALlogo.png" alt="UCSAL Logo" class="logo" />
+      <h1>Seja bem-vindo ao AEUCSAL!</h1>
+      <p>O portal de reservas de espaços acadêmicos da UCSAL.</p>
+    </div>
+    <div class="right-panel">
+      <div class="card">
+        <h2>Cadastro</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <input type="text" id="firstName" placeholder="Nome" required />
+            <span class="error-message" id="error-firstName"></span>
+          </div>
+          <div class="form-group">
+            <input type="text" id="lastName" placeholder="Sobrenome" required />
+            <span class="error-message" id="error-lastName"></span>
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" placeholder="E-mail institucional" required />
+            <span class="error-message" id="error-email"></span>
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="password"
+              placeholder="Senha (mín. 6 caracteres)"
+              required
+            />
+            <span class="error-message" id="error-password"></span>
+          </div>
+          <div class="form-group">
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Confirme a senha"
+              required
+            />
+            <span class="error-message" id="error-confirmPassword"></span>
+          </div>
+          <button type="submit" class="btn">Cadastrar</button>
+        </form>
+        <p class="small-text">
+          Já tem uma conta?
+          <a href="index.html">Faça o login</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal global -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal-content">
+      <p id="modalMessage"></p>
+      <button id="modalButton">OK</button>
+    </div>
+  </div>
+
+  <script src="../js/ui.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/validation.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+</html>
