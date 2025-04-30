@@ -14,6 +14,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RegistrationController {
 
+    private static final String LOGIN_URL = "http://localhost:63342/scea/static/pages/index.html";
+
     private final RegistrationService registrationService;
     private final ConfirmationTokenService confirmationTokenService;
 
@@ -35,7 +37,7 @@ public class RegistrationController {
                     "Falha na Confirmação",
                     "❌ Link de confirmação inválido.",
                     "Voltar ao Login",
-                    "../pages/index.html"
+                    LOGIN_URL
             );
         }
 
@@ -47,7 +49,7 @@ public class RegistrationController {
                     "Conta Já Ativada",
                     "✅ Este e-mail já foi confirmado anteriormente.",
                     "Ir para Login",
-                    "../pages/index.html"
+                    LOGIN_URL
             );
         }
 
@@ -62,7 +64,7 @@ public class RegistrationController {
                 "Conta Confirmada",
                 "✅ Seu e-mail foi ativado com sucesso! Agora você pode fazer login.",
                 "Ir para Login",
-                "../pages/index.html"
+                LOGIN_URL
         );
     }
 
@@ -83,7 +85,6 @@ public class RegistrationController {
                 + "style=\"max-width:600px;margin:0 auto;"
                 + "background:#ffffff;border-radius:8px;overflow:hidden;"
                 + "box-shadow:0 0 10px rgba(0,0,0,0.1);\">" +
-
                 "    <tr>" +
                 "      <td style=\"background:#2d3159;"
                 + "text-align:center;padding:20px;\">" +
@@ -91,7 +92,6 @@ public class RegistrationController {
                 + "font-size:24px;\">" + title + "</h1>" +
                 "      </td>" +
                 "    </tr>" +
-
                 "    <tr>" +
                 "      <td style=\"padding:30px;text-align:center;\">" +
                 "        <p style=\"font-size:16px;color:#333;"
@@ -106,7 +106,6 @@ public class RegistrationController {
                 "        </div>" +
                 "      </td>" +
                 "    </tr>" +
-
                 "    <tr>" +
                 "      <td style=\"background:#f6f6f6;text-align:center;"
                 + "padding:20px;font-size:14px;color:#999;\">" +
@@ -130,7 +129,6 @@ public class RegistrationController {
                 + "style=\"max-width:600px;margin:0 auto;"
                 + "background:#ffffff;border-radius:8px;overflow:hidden;"
                 + "box-shadow:0 0 10px rgba(0,0,0,0.1);\">" +
-
                 "    <tr>" +
                 "      <td style=\"background:#F44336;"
                 + "text-align:center;padding:20px;\">" +
@@ -138,7 +136,6 @@ public class RegistrationController {
                 + "font-size:24px;\">❌ Link Expirado</h1>" +
                 "      </td>" +
                 "    </tr>" +
-
                 "    <tr>" +
                 "      <td style=\"padding:30px;text-align:center;\">" +
                 "        <p style=\"font-size:16px;color:#333;"
@@ -158,7 +155,7 @@ public class RegistrationController {
                 "              Reenviar e-mail" +
                 "            </button>" +
                 "          </form>" +
-                "          <a href=\"../pages/index.html\" "
+                "          <a href=\"" + LOGIN_URL + "\" "
                 + "style=\"background:#f6f6f6;color:#333;"
                 + "text-decoration:none;padding:12px 24px;"
                 + "border-radius:6px;font-weight:bold;"
@@ -168,7 +165,6 @@ public class RegistrationController {
                 "        </div>" +
                 "      </td>" +
                 "    </tr>" +
-
                 "    <tr>" +
                 "      <td style=\"background:#f6f6f6;text-align:center;"
                 + "padding:20px;font-size:14px;color:#999;\">" +

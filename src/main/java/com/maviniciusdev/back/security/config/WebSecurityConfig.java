@@ -3,6 +3,7 @@ package com.maviniciusdev.back.security.config;
 import com.maviniciusdev.back.appuser.AppUserService;
 import com.maviniciusdev.back.security.jwt.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,31 +35,35 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        // registro, check e login seguem abertos
+                        // Permite recursos estáticos (CSS, JS, imagens)
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        // Permite páginas HTML estáticas
+                        .requestMatchers("/pages/**", "/*.html").permitAll()
+                        // Endpoints abertos de autenticação
                         .requestMatchers(
                                 "/api/v*/registration/**",
                                 "/api/v1/users/exists",
-                                "/api/v1/auth/login"
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/forgot-password",
+                                "/api/v1/auth/confirm-reset",
+                                "/api/v1/auth/reset-password"
                         ).permitAll()
-
-                        // rotas só para ADMIN
+                        // Rotas apenas para ADMIN
                         .requestMatchers(
                                 "/api/v1/academic-spaces/create",
                                 "/api/v1/academic-spaces/update/**",
                                 "/api/v1/academic-spaces/update-availability/**",
                                 "/api/v1/academic-spaces/delete/**",
-                                "/api/v1/users/**"      // exemplo de endpoints de gestão de usuários
+                                "/api/v1/users/**"
                         ).hasRole("ADMIN")
-
-                        // rotas acessíveis a USER e ADMIN
+                        // Rotas acessíveis a USER e ADMIN
                         .requestMatchers(
                                 "/api/v1/reservations/**",
                                 "/api/v1/academic-spaces/available",
                                 "/api/v1/academic-spaces/active",
                                 "/api/v1/academic-spaces/by-code/**"
                         ).hasAnyRole("USER", "ADMIN")
-
-                        // todo o resto precisa de autenticação
+                        // Qualquer outra requisição precisa de autenticação
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

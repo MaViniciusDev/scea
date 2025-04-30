@@ -1,127 +1,165 @@
 // app.js
-// Fluxo de login em 2 etapas e cadastro.
+// Fluxo de login em 2 etapas e cadastro, com tratamento de token expirado via toast
 
-// estado global
+// Estado global
 let currentEmail     = '';
 let currentFirstName = '';
 let currentLastName  = '';
 
-// elementos de formulário
+// Elementos de formulário
 const emailForm    = document.getElementById('emailForm');
 const passwordForm = document.getElementById('passwordForm');
 const registerForm = document.getElementById('registerForm');
 
-// 1) Etapa de e-mail no login
-if (emailForm) {
-    emailForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        clearFieldErrors('emailForm');
-
-        const email = document.getElementById('emailInput').value.trim();
-        if (!isEmailValid(email)) {
-            showFieldError('emailInput', 'E-mail inválido');
-            return;
-        }
-
+// --- Interceptador fetch para capturar 401 (token expirado) ---
+(function() {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
         try {
-            showLoader();
-            const { exists, confirmed, firstName, lastName } = await checkUserExists(email);
-
-            if (!exists) {
-                showFieldError('emailInput', 'E-mail não cadastrado');
-                return;
-            }
-            if (!confirmed) {
-                showModal(
-                    'Você se registrou, mas ainda não confirmou o e-mail. Verifique sua caixa de entrada.',
-                    false
+            const response = await originalFetch(...args);
+            if (response.status === 401) {
+                // Armazena mensagem para exibir no login
+                sessionStorage.setItem(
+                    'toastMessage',
+                    'Seu token expirou. Faça login novamente.'
                 );
+                // Redireciona imediatamente ao login
+                window.location.href = 'index.html';
+                return Promise.reject(new Error('Token expirado'));
+            }
+            return response;
+        } catch (err) {
+            return Promise.reject(err);
+        }
+    };
+})();
+
+// --- DOMContentLoaded: exibe toast caso exista e inicia fluxos ---
+document.addEventListener('DOMContentLoaded', () => {
+    // 0) Exibe toast de mensagem pendente (ex: token expirado)
+    const pendingToast = sessionStorage.getItem('toastMessage');
+    if (pendingToast) {
+        showToast(pendingToast);
+        sessionStorage.removeItem('toastMessage');
+    }
+
+    // 1) Etapa de e-mail no login
+    if (emailForm) {
+        emailForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            clearFieldErrors('emailForm');
+
+            const email = document.getElementById('emailInput').value.trim();
+            if (!isEmailValid(email)) {
+                showFieldError('emailInput', 'E-mail inválido');
                 return;
             }
 
-            // avançar para a etapa de senha
-            currentEmail     = email;
-            currentFirstName = firstName;
-            currentLastName  = lastName;
-            document.getElementById('greeting').innerText =
-                `Bem-vindo, ${currentFirstName} ${currentLastName}!`;
-            document.getElementById('login-step-email').classList.add('hidden');
-            document.getElementById('login-step-password').classList.remove('hidden');
+            try {
+                showLoader();
+                const { exists, confirmed, firstName, lastName } = await checkUserExists(email);
 
-        } catch (err) {
-            showModal('Erro ao verificar e-mail: ' + err.message, false);
-        } finally {
-            hideLoader();
-        }
-    });
-}
+                if (!exists) {
+                    showFieldError('emailInput', 'E-mail não cadastrado');
+                    return;
+                }
+                if (!confirmed) {
+                    showModal(
+                        'Você se registrou, mas ainda não confirmou o e-mail. Verifique sua caixa de entrada.',
+                        false
+                    );
+                    return;
+                }
 
-// 2) Etapa de senha no login
-if (passwordForm) {
-    passwordForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        clearFieldErrors('passwordForm');
+                // Avança para etapa de senha
+                currentEmail     = email;
+                currentFirstName = firstName;
+                currentLastName  = lastName;
+                document.getElementById('greeting').innerText =
+                    `Bem-vindo, ${currentFirstName} ${currentLastName}!`;
+                document.getElementById('login-step-email').classList.add('hidden');
+                document.getElementById('login-step-password').classList.remove('hidden');
 
-        const password = document.getElementById('passwordInput').value;
-        if (!isPasswordStrong(password)) {
-            showFieldError('passwordInput', 'Senha deve ter ao menos 6 caracteres');
-            return;
-        }
+            } catch (err) {
+                showModal('Erro ao verificar e-mail: ' + err.message, false);
+            } finally {
+                hideLoader();
+            }
+        });
+    }
 
-        try {
-            showLoader();
-            const { authenticated, token, message } = await loginUser(currentEmail, password);
+    // 2) Etapa de senha no login
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            clearFieldErrors('passwordForm');
 
-            if (!authenticated) {
-                showModal(message || 'Falha na autenticação.', false);
+            const password = document.getElementById('passwordInput').value;
+            if (!isPasswordStrong(password)) {
+                showFieldError('passwordInput', 'Senha deve ter ao menos 6 caracteres');
                 return;
             }
 
-            // salva token e redireciona
-            localStorage.setItem('scea-token', token);
-            window.location.href = 'dashboard.html';
+            try {
+                showLoader();
+                // Agora também extrai role do usuário
+                const { authenticated, token, role, message } = await loginUser(currentEmail, password);
 
-        } catch (err) {
-            showModal('Erro ao fazer login: ' + err.message, false);
-        } finally {
-            hideLoader();
-        }
-    });
-}
+                if (!authenticated) {
+                    showModal(message || 'Falha na autenticação.', false);
+                    return;
+                }
 
-// 3) Fluxo de cadastro
-if (registerForm) {
-    registerForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        clearFieldErrors('registerForm');
+                // Salva token e dados do usuário
+                localStorage.setItem('jwtToken', token);
+                localStorage.setItem('firstName', currentFirstName);
+                localStorage.setItem('lastName', currentLastName);
+                localStorage.setItem('role', role || 'USER');
 
-        const data = {
-            firstName:       document.getElementById('firstName').value.trim(),
-            lastName:        document.getElementById('lastName').value.trim(),
-            email:           document.getElementById('email').value.trim(),
-            password:        document.getElementById('password').value,
-            confirmPassword: document.getElementById('confirmPassword').value
-        };
+                // Redireciona ao dashboard
+                window.location.href = 'dashboard.html';
 
-        // validações básicas (campo a campo)
-        const errors = validateRegistration(data);
-        if (Object.keys(errors).length) {
-            Object.entries(errors)
-                .forEach(([field, msg]) => showFieldError(field, msg));
-            return;
-        }
+            } catch (err) {
+                showModal('Erro ao fazer login: ' + err.message, false);
+            } finally {
+                hideLoader();
+            }
+        });
+    }
 
-        try {
-            showLoader();
-            await registerUser(data);
-            showModal(
-                'Cadastro realizado! Verifique seu e-mail para confirmar.',
-                true
-            );
-        } catch (err) {
-            showModal('Erro ao cadastrar: ' + err.message, false);
-        } finally {
-            hideLoader();
-        }
-    });
-}
+    // 3) Fluxo de cadastro
+    if (registerForm) {
+        registerForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            clearFieldErrors('registerForm');
+
+            const data = {
+                firstName:       document.getElementById('firstName').value.trim(),
+                lastName:        document.getElementById('lastName').value.trim(),
+                email:           document.getElementById('email').value.trim(),
+                password:        document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirmPassword').value
+            };
+
+            const errors = validateRegistration(data);
+            if (Object.keys(errors).length) {
+                Object.entries(errors)
+                    .forEach(([field, msg]) => showFieldError(field, msg));
+                return;
+            }
+
+            try {
+                showLoader();
+                await registerUser(data);
+                showModal(
+                    'Cadastro realizado! Verifique seu e-mail para confirmar.',
+                    true
+                );
+            } catch (err) {
+                showModal('Erro ao cadastrar: ' + err.message, false);
+            } finally {
+                hideLoader();
+            }
+        });
+    }
+});

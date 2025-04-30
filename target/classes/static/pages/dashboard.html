@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Dashboard • AEUCSAL</title>
+    <link rel="stylesheet" href="../css/dashboard.css"/>
+</head>
+<body>
+<!-- Loader e Modal genéricos -->
+<div id="loader" class="loader-overlay hidden"><div class="spinner"></div></div>
+<div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal-content">
+        <p id="modalMessage"></p>
+        <button id="modalButton">OK</button>
+    </div>
+</div>
+
+<div class="container">
+    <!-- NAV LATERAL -->
+    <nav class="sidebar">
+        <img src="../img/UCSALlogo.png" alt="UCSAL Logo" class="logo" />
+        <ul id="menuItems"></ul>
+        <div class="logout">
+            <a href="#" id="logoutLink">↩ Log-out</a>
+        </div>
+        <div class="user-info">
+            <span id="userInfo"></span><br/>
+            <a href="config.html" class="edit-profile">editar perfil</a>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="content">
+        <h1>Próximas Reservas</h1>
+        <div id="nextReservations" class="cards-container"></div>
+
+        <section class="bottom-widgets">
+            <div class="calendar-widget" id="calendarContainer"></div>
+            <div class="top-spaces-widget">
+                <h2>Espaços mais reservados</h2>
+                <ul id="topSpacesList"></ul>
+                <button class="btn" id="viewAllSpaces">Ver todos os espaços</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="../js/ui.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/dashboard.js"></script>
+</body>
+</html>

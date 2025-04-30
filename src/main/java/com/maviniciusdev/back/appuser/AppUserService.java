@@ -32,31 +32,38 @@ public class AppUserService implements UserDetailsService {
                 );
     }
 
+
+     //Busca um usuário por e-mail.
+
+    public Optional<AppUser> findByEmail(String email) {
+        return appUserRepository.findByEmail(email);
+    }
+
+    /**
+     * Verifica existência de usuário por e-mail.
+     */
+    public boolean existsByEmail(String email) {
+        return appUserRepository.findByEmail(email).isPresent();
+    }
+
     /**
      * Registra um novo usuário e gera um token de confirmação.
-     * O primeiro usuário salvo recebe ROLE_ADMIN, os demais ROLE_USER.
      */
     public String signUpUser(AppUser appUser) {
-        // 1) Verifica se já existe usuário com o mesmo e-mail
-        if (appUserRepository.findByEmail(appUser.getEmail()).isPresent()) {
+        if (existsByEmail(appUser.getEmail())) {
             throw new IllegalStateException("Email já cadastrado");
         }
 
-        // 2) Criptografa a senha
         appUser.setPassword(
                 bCryptPasswordEncoder.encode(appUser.getPassword())
         );
 
-        // 3) Define role: primeiro cadastro = ADMIN
         boolean isFirstUser = appUserRepository.count() == 0;
         appUser.setAppUserRole(
                 isFirstUser ? AppUserRole.ADMIN : AppUserRole.USER
         );
 
-        // 4) Persiste o usuário
         appUserRepository.save(appUser);
-
-        // 5) Cria e retorna token de confirmação via serviço dedicado
         return confirmationTokenService.createToken(appUser);
     }
 
@@ -68,16 +75,23 @@ public class AppUserService implements UserDetailsService {
     }
 
     /**
-     * Busca um usuário por e-mail.
+     * Carrega a entidade AppUser por e-mail (usado no fluxo de reset de senha).
      */
-    public Optional<AppUser> findByEmail(String email) {
-        return appUserRepository.findByEmail(email);
+    public AppUser loadUserByEmail(String email) {
+        return appUserRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                String.format(USER_NOT_FOUND_MSG, email)
+                        )
+                );
     }
 
     /**
-     * Verifica existência de usuário por e-mail.
+     * Atualiza a senha de um usuário (usado no fluxo de reset de senha).
      */
-    public boolean existsByEmail(String email) {
-        return appUserRepository.findByEmail(email).isPresent();
+    public void updatePassword(String email, String rawNewPassword) {
+        AppUser user = loadUserByEmail(email);
+        user.setPassword(bCryptPasswordEncoder.encode(rawNewPassword));
+        appUserRepository.save(user);
     }
 }

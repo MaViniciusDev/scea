@@ -1,18 +1,23 @@
+// src/main/resources/static/js/validation.js
+
 /**
  * validation.js
  * Regras de validação de formulário.
  */
 
-function isEmailValid(email) {
+// valida e-mail
+export function isEmailValid(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
 }
 
-function isPasswordStrong(password) {
+// valida força da senha
+export function isPasswordStrong(password) {
     return typeof password === 'string' && password.length >= 6;
 }
 
-function validateRegistration(data) {
+// valida cadastro completo
+export function validateRegistration(data) {
     const errors = {};
     if (!data.firstName || data.firstName.trim() === '') {
         errors.firstName = 'Digite seu nome.';
