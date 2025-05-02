@@ -1,3 +1,4 @@
+// src/main/java/com/maviniciusdev/back/reservation/ReservationRepository.java
 package com.maviniciusdev.back.reservation;
 
 import com.maviniciusdev.back.spaces.AcademicSpaces;
@@ -13,9 +14,17 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT r FROM Reservation r WHERE r.academicSpaces = :space AND r.reservationDate = :date " +
-            "AND ((r.reservationInit < :endTime AND r.reservationEnd > :startTime) OR " +
-            "(r.reservationInit >= :startTime AND r.reservationInit < :endTime))")
+    @Query("""
+      SELECT r
+      FROM Reservation r
+      WHERE r.academicSpaces = :space
+        AND r.reservationDate = :date
+        AND (
+          (r.reservationInit < :endTime AND r.reservationEnd > :startTime)
+          OR
+          (r.reservationInit >= :startTime AND r.reservationInit < :endTime)
+        )
+    """)
     List<Reservation> findConflictingReservations(
             @Param("space") AcademicSpaces space,
             @Param("date") LocalDate date,
@@ -23,7 +32,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("endTime") LocalTime endTime
     );
 
-    @Query("SELECT r FROM Reservation r WHERE r.professor.email = :email " +
-            "ORDER BY r.reservationDate, r.reservationInit")
+    @Query("""
+      SELECT r
+      FROM Reservation r
+      WHERE r.professor.email = :email
+        AND r.reservationDate >= CURRENT_DATE
+      ORDER BY r.reservationDate
+    """)
     List<Reservation> findByProfessorEmail(@Param("email") String email);
 }

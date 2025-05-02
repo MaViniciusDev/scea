@@ -17,9 +17,7 @@ import java.util.Collections;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-
 public class AppUser implements UserDetails {
-
 
     @SequenceGenerator(
             name = "professor_sequence",
@@ -32,12 +30,15 @@ public class AppUser implements UserDetails {
             generator = "professor_sequence"
     )
     private Long id;
+
     private String firstName;
     private String lastName;
     private String email;
     private String password;
+
     @Enumerated(EnumType.STRING)
     private AppUserRole appUserRole;
+
     private Boolean locked = false;
     private Boolean enabled = false;
 
@@ -55,8 +56,9 @@ public class AppUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Prefixo "ROLE_" é necessário para hasRole("ADMIN") funcionar
         SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority(appUserRole.name());
+                new SimpleGrantedAuthority("ROLE_" + appUserRole.name());
         return Collections.singletonList(authority);
     }
 
@@ -70,10 +72,13 @@ public class AppUser implements UserDetails {
         return email;
     }
 
-    public String getFirstName() { return firstName; }
+    public String getFirstName() {
+        return firstName;
+    }
 
-
-    public String getLastName() { return lastName; }
+    public String getLastName() {
+        return lastName;
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -94,6 +99,4 @@ public class AppUser implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
-
-
 }

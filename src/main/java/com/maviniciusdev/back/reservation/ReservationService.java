@@ -1,3 +1,4 @@
+// src/main/java/com/maviniciusdev/back/reservation/ReservationService.java
 package com.maviniciusdev.back.reservation;
 
 import com.maviniciusdev.back.spaces.AcademicSpaces;
@@ -32,6 +33,9 @@ public class ReservationService {
         }
         reservationRepository.deleteById(id);
     }
+
+
+     //Retorna todas as reservas, a partir de hoje, do professor com o e-mail dado.
 
     public List<Reservation> getByProfessorEmail(String email) {
         return reservationRepository.findByProfessorEmail(email);

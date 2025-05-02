@@ -62,3 +62,46 @@ export async function resetPassword(token, newPassword) {
     await handleResponse(resp);
     return resp.text();
 }
+
+// ===== Espaços Acadêmicos =====
+
+/** Busca espaços ativos. */
+export async function getActiveSpaces(token) {
+    const resp = await fetch(`${API_BASE}/academic-spaces/active`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    await handleResponse(resp);
+    return resp.json();
+}
+
+/** Busca próximas reservas do usuário. */
+export async function getNextReservations(token) {
+    const resp = await fetch(`${API_BASE}/reservations/user`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    await handleResponse(resp);
+    return resp.json();
+}
+
+/** Cria um novo espaço acadêmico. */
+export async function createSpace(payload, token) {
+    const resp = await fetch(`${API_BASE}/academic-spaces/create`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':  'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+    await handleResponse(resp);
+    return resp.json();
+}
+
+/** Exclui um espaço por ID. */
+export async function deleteSpaceById(id, token) {
+    const resp = await fetch(`${API_BASE}/academic-spaces/delete/${id}`, {
+        method: 'DELETE',
+        headers: {'Authorization': `Bearer ${token}`}
+    });
+    await handleResponse(resp);
+}

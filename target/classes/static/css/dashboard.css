@@ -200,3 +200,211 @@ body {
     font-weight: 600;
     cursor: pointer;
 }
+
+/* === Stats card === */
+.stats-card {
+    display: flex;
+    gap: 1.5rem;
+    background: #f8f9fc;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.stats-card .stat {
+    flex: 1;
+    text-align: center;
+}
+.stat-label {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1b1e23;
+}
+
+/* === Botão central === */
+.centered-action {
+    text-align: center;
+    margin-top: 2rem;
+}
+.circle-btn {
+    width: 64px;
+    height: 64px;
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 2rem;
+    line-height: 64px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.circle-btn:hover {
+    background: #2e59d9;
+}
+.centered-action p {
+    margin-top: 0.5rem;
+    color: #333;
+    font-weight: 600;
+}
+
+/* === Gerenciar Espaços Modal === */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10000;
+}
+.modal-content-large {
+    background: #fff;
+    width: 90%; max-width: 800px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+.modal-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+.modal-header h2 {
+    margin: 0; font-size: 1.25rem; display: flex; align-items: center;
+}
+.modal-header .close-btn {
+    background: none; border: none;
+    font-size: 1.5rem; cursor: pointer;
+    line-height: 1;
+}
+.modal-body {
+    padding: 1rem 1.5rem;
+    flex: 1; display: flex; flex-direction: column;
+}
+.modal-search {
+    margin-bottom: 1rem;
+}
+.modal-search input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d3e2;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+.spaces-list-container {
+    flex: 1;
+    overflow-y: auto;
+    border-top: 1px solid #e3e6f0;
+    padding-top: 1rem;
+}
+.spaces-list-container ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.spaces-list-container li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f2f2f2;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+}
+.spaces-list-container li .space-name {
+    flex: 1;
+    font-weight: 600;
+    color: #1b1e23;
+}
+.spaces-list-container li .actions {
+    display: flex; gap: 0.5rem;
+}
+.spaces-list-container li button {
+    border: none; cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+.spaces-list-container li .edit-btn {
+    background: #f6c23e;
+    color: #fff;
+}
+.spaces-list-container li .delete-btn {
+    background: #e74a3b;
+    color: #fff;
+}
+.modal-footer {
+    padding: 1rem 1.5rem;
+    background: #f8f9fc;
+    border-top: 1px solid #e3e6f0;
+    text-align: right;
+}
+.modal-footer .btn {
+    background: #4e73df;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* === Estilos do Modal de Cadastro de Espaço === */
+#modalCadastroEspaco .modal-body input[type="text"],
+#modalCadastroEspaco .modal-body input[type="number"],
+#modalCadastroEspaco .modal-body textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+}
+
+/* agrupa select + rádios na mesma linha */
+#modalCadastroEspaco .row-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* estilo do select igual aos inputs */
+#modalCadastroEspaco .select-group select {
+    padding: 0.75rem 1rem;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+}
+#modalCadastroEspaco .select-group label {
+    margin-right: 0.5rem;
+    font-weight: 600;
+}
+
+/* Radio-group como “pill buttons” */
+#modalCadastroEspaco .radio-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+#modalCadastroEspaco .radio-group input[type="radio"] {
+    display: none;
+}
+#modalCadastroEspaco .radio-group label {
+    padding: 0.5rem 1rem;
+    background: #d1d3e2;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+#modalCadastroEspaco .radio-group input[type="radio"]:checked + label {
+    background: #2ecc71;
+    color: #fff;
+}
