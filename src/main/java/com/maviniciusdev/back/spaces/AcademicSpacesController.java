@@ -1,4 +1,3 @@
-// AcademicSpacesController.java
 package com.maviniciusdev.back.spaces;
 
 import lombok.AllArgsConstructor;
@@ -19,23 +18,17 @@ public class AcademicSpacesController {
         try {
             return ResponseEntity.ok(academicSpacesService.createSpace(academicSpaces));
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(500)
-                    .body("Erro ao criar espaço acadêmico: " + e.getMessage());
+            return ResponseEntity.status(500).body("Erro ao criar espaço acadêmico: " + e.getMessage());
         }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateSpace(
-            @PathVariable Long id,
-            @RequestBody AcademicSpaces academicSpaces
-    ) {
+    public ResponseEntity<?> updateSpace(@PathVariable Long id,
+                                         @RequestBody AcademicSpaces academicSpaces) {
         try {
             return ResponseEntity.ok(academicSpacesService.updateSpace(id, academicSpaces));
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(500)
-                    .body("Erro ao atualizar espaço acadêmico: " + e.getMessage());
+            return ResponseEntity.status(500).body("Erro ao atualizar espaço acadêmico: " + e.getMessage());
         }
     }
 
@@ -44,17 +37,19 @@ public class AcademicSpacesController {
         return ResponseEntity.ok(academicSpacesService.getActiveSpaces());
     }
 
+    // Novo endpoint: retorna todos espaços, ativos ou não
+    @GetMapping("/all")
+    public ResponseEntity<List<AcademicSpaces>> getAllSpaces() {
+        return ResponseEntity.ok(academicSpacesService.getAllSpaces());
+    }
+
     @PutMapping("/update-availability/{id}")
-    public ResponseEntity<?> updateAvailability(
-            @PathVariable Long id,
-            @RequestParam boolean active
-    ) {
+    public ResponseEntity<?> updateAvailability(@PathVariable Long id,
+                                                @RequestParam boolean active) {
         try {
             return ResponseEntity.ok(academicSpacesService.updateAvailability(id, active));
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(500)
-                    .body("Erro ao atualizar disponibilidade do espaço acadêmico: " + e.getMessage());
+            return ResponseEntity.status(500).body("Erro ao atualizar disponibilidade do espaço acadêmico: " + e.getMessage());
         }
     }
 
@@ -62,11 +57,9 @@ public class AcademicSpacesController {
     public ResponseEntity<?> deleteSpace(@PathVariable Long id) {
         try {
             academicSpacesService.deleteSpace(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(500)
-                    .body("Erro ao excluir espaço acadêmico: " + e.getMessage());
+            return ResponseEntity.status(500).body("Erro ao excluir espaço acadêmico: " + e.getMessage());
         }
     }
 }

@@ -33,22 +33,21 @@ public class AppUserService implements UserDetailsService {
     }
 
 
-     //Busca um usuário por e-mail.
+     // Busca um usuário por e-mail.
 
     public Optional<AppUser> findByEmail(String email) {
         return appUserRepository.findByEmail(email);
     }
 
-    /**
-     * Verifica existência de usuário por e-mail.
-     */
+    // Verifica existência de usuário por e-mail.
+
     public boolean existsByEmail(String email) {
         return appUserRepository.findByEmail(email).isPresent();
     }
 
-    /**
-     * Registra um novo usuário e gera um token de confirmação.
-     */
+
+     // Registra um novo usuário e gera um token de confirmação.
+
     public String signUpUser(AppUser appUser) {
         if (existsByEmail(appUser.getEmail())) {
             throw new IllegalStateException("Email já cadastrado");
@@ -67,16 +66,16 @@ public class AppUserService implements UserDetailsService {
         return confirmationTokenService.createToken(appUser);
     }
 
-    /**
-     * Habilita (ativa) um usuário após confirmação do token.
-     */
+
+      // Habilita um usuário após confirmação do token.
+
     public int enableAppUser(String email) {
         return appUserRepository.enableAppUser(email);
     }
 
-    /**
-     * Carrega a entidade AppUser por e-mail (usado no fluxo de reset de senha).
-     */
+
+     // Carrega a entidade AppUser por e-mail (usado no fluxo de reset de senha).
+
     public AppUser loadUserByEmail(String email) {
         return appUserRepository.findByEmail(email)
                 .orElseThrow(() ->
@@ -86,9 +85,8 @@ public class AppUserService implements UserDetailsService {
                 );
     }
 
-    /**
-     * Atualiza a senha de um usuário (usado no fluxo de reset de senha).
-     */
+    // Atualiza a senha de um usuário (usado no fluxo de reset de senha).
+
     public void updatePassword(String email, String rawNewPassword) {
         AppUser user = loadUserByEmail(email);
         user.setPassword(bCryptPasswordEncoder.encode(rawNewPassword));

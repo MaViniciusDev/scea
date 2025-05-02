@@ -1,4 +1,3 @@
-// AcademicSpacesService.java
 package com.maviniciusdev.back.spaces;
 
 import lombok.AllArgsConstructor;
@@ -27,12 +26,18 @@ public class AcademicSpacesService {
         spaces.setSpaceType(academicSpaces.getSpaceType());
         spaces.setHasComputer(academicSpaces.isHasComputer());
         spaces.setActive(academicSpaces.isActive());
+        spaces.setDisableReason(academicSpaces.getDisableReason());
 
         return academicSpacesRepository.save(spaces);
     }
 
     public List<AcademicSpaces> getActiveSpaces() {
         return academicSpacesRepository.findByActiveTrue();
+    }
+
+    // retorna todos, ativos ou não
+    public List<AcademicSpaces> getAllSpaces() {
+        return academicSpacesRepository.findAll();
     }
 
     public AcademicSpaces updateAvailability(Long id, boolean active) {
