@@ -3,6 +3,8 @@ package com.maviniciusdev.back.registration;
 import com.maviniciusdev.back.registration.token.ConfirmationToken;
 import com.maviniciusdev.back.registration.token.ConfirmationTokenService;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -176,9 +178,10 @@ public class RegistrationController {
                 "</html>";
     }
 
+    @Setter
+    @Getter
     public static class ResendRequest {
         private String email;
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
+
     }
 }

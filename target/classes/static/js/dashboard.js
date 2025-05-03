@@ -13,14 +13,14 @@ export function initSidebar() {
         const links = (role === 'ADMIN')
             ? [
                 { text: 'Dashboard',     href: 'dashboard.html' },
-                { text: 'Reservas',      href: 'reservas.html'  },
+                { text: 'Reservas',      href: 'reservations.html'  },
                 { text: 'Espaços Acad.', href: 'spacesAdminOverview.html' },
                 { text: 'Professores',   href: 'professores.html'  },
                 { text: 'Configurações', href: 'config.html' }
             ]
             : [
                 { text: 'Início',        href: 'dashboard.html'       },
-                { text: 'Reservas',      href: 'reservation-user.html' },
+                { text: 'Reservas',      href: 'reservations.html' },
                 { text: 'Configurações', href: 'config.html'          }
             ];
         menuItems.innerHTML = links

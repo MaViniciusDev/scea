@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -21,10 +20,9 @@ public class RegistrationService {
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
 
-    /**
-     * Registra um novo usuário, gera um token de confirmação
-     * com validade de 15 minutos e dispara o e-mail.
-     */
+
+     //Registra um novo usuário, gera um token de confirmação com validade de 15 minutos e dispara o e-mail.
+
     public String register(RegistrationRequest request) {
         // 1) Valida formato de e-mail
         if (!emailValidator.test(request.getEmail())) {
@@ -49,11 +47,11 @@ public class RegistrationService {
         return token;
     }
 
-    /**
-     * Confirma o token de e-mail:
-     * - lança IllegalStateException em caso de token inválido, expirado ou já usado.
-     * - marca confirmado e habilita o usuário.
-     */
+
+     // Confirma o token de e-mail:
+     // -lança IllegalStateException em caso de token inválido, expirado ou já usado.
+     //- marca confirmado e habilita o usuário.
+
     @Transactional
     public void confirmToken(String token) {
         ConfirmationToken ct = confirmationTokenService
@@ -72,10 +70,10 @@ public class RegistrationService {
         appUserService.enableAppUser(ct.getAppUser().getEmail());
     }
 
-    /**
-     * Gera e dispara um novo token de confirmação para o e-mail
-     * caso exista o usuário e ele ainda não esteja habilitado.
-     */
+
+     // Gera e dispara um novo token de confirmação para o e-mail
+     // caso exista o usuário e ele ainda não esteja habilitado.
+
     public String resendToken(String email) {
         AppUser user = appUserService.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("Usuário não encontrado"));
@@ -93,9 +91,9 @@ public class RegistrationService {
         return token;
     }
 
-    /**
-     * Monta o HTML do e-mail de confirmação.
-     */
+
+     // Monta o HTML do e-mail de confirmação.
+
     private String buildEmail(String name, String link) {
         return "<!DOCTYPE html>" +
                 "<html lang=\"pt-BR\">" +

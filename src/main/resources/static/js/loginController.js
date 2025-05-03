@@ -1,41 +1,26 @@
 // loginController.js
-// Orquestra o fluxo de login em duas etapas.
-
+// Orquestra o fluxo de login em duas etapas, usando auth.js para autenticação
 import {
     showLoader,
     hideLoader,
     showModal,
     showFieldError,
-    clearFieldErrors,
-    showToast
+    clearFieldErrors
 } from './ui.js';
-
-import { checkUserExists, loginUser } from './api.js';
-
+import { checkUserExists } from './api.js';
 import { isEmailValid, isPasswordStrong } from './validation.js';
+import { performLogin } from './auth.js';
 
 let currentEmail = '';
 let currentFirstName = '';
 let currentLastName = '';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 0) Toast pendente (token expirado)
-    const pendingToast = sessionStorage.getItem('toastMessage');
-    if (pendingToast) {
-        showToast(pendingToast);
-        sessionStorage.removeItem('toastMessage');
-    }
-
     const emailForm = document.getElementById('emailForm');
     const passwordForm = document.getElementById('passwordForm');
 
-    if (emailForm) {
-        emailForm.addEventListener('submit', onEmailSubmit);
-    }
-
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', onPasswordSubmit);
-    }
+    if (emailForm) emailForm.addEventListener('submit', onEmailSubmit);
+    if (passwordForm) passwordForm.addEventListener('submit', onPasswordSubmit);
 });
 
 async function onEmailSubmit(e) {
@@ -64,12 +49,11 @@ async function onEmailSubmit(e) {
             return;
         }
 
-        // Avança para etapa de senha
         currentEmail = email;
         currentFirstName = firstName;
         currentLastName = lastName;
         document.getElementById('greeting').innerText =
-            `Bem-vindo, ${firstName} ${lastName}!`;
+            `Bem-vindo, ${currentFirstName} ${currentLastName}!`;
         document.getElementById('login-step-email').classList.add('hidden');
         document.getElementById('login-step-password').classList.remove('hidden');
 
@@ -90,28 +74,12 @@ async function onPasswordSubmit(e) {
         return;
     }
 
-    try {
-        showLoader();
-        const { authenticated, token, role, message } =
-            await loginUser(currentEmail, password);
-
-        if (!authenticated) {
-            showModal(message || 'Falha na autenticação.', false);
-            return;
-        }
-
-        // Salva token e dados do usuário
-        localStorage.setItem('jwtToken', token);
+    await performLogin(currentEmail, password, role => {
         localStorage.setItem('firstName', currentFirstName);
         localStorage.setItem('lastName', currentLastName);
         localStorage.setItem('role', role || 'USER');
-
-        // Redireciona ao dashboard
         window.location.href = 'dashboard.html';
-
-    } catch (err) {
-        showModal('Erro ao fazer login: ' + err.message, false);
-    } finally {
-        hideLoader();
-    }
+    });
 }
+
+export { onEmailSubmit, onPasswordSubmit };

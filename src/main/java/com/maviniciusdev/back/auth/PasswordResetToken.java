@@ -31,7 +31,7 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(nullable = true)
+    @Column
     private LocalDateTime confirmedAt;
 
     @OneToOne

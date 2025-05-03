@@ -1,9 +1,4 @@
-// src/main/resources/static/js/validation.js
-
-/**
- * validation.js
- * Regras de validação de formulário.
- */
+//validação de formulários
 
 // valida e-mail
 export function isEmailValid(email) {
