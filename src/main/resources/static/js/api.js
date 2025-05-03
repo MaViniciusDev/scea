@@ -130,3 +130,16 @@ export async function getReservationsBySpace(spaceId, token) {
     await handleResponse(resp);
     return resp.json();
 }
+/** Exclui uma reserva pelo ID */
+export async function deleteReservation(reservationId, token) {
+    const resp = await fetch(
+        `${API_BASE}/reservations/${encodeURIComponent(reservationId)}`,
+        {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }
+    );
+    await handleResponse(resp);
+    // Se quiser ler a mensagem de confirmação do backend:
+    return resp.text();
+}
