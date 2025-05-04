@@ -1,6 +1,6 @@
 // dashboard.js
-import { showLoader, hideLoader, showModal } from './ui.js';
-import { getNextReservations, getActiveSpaces } from './api.js';
+import {hideLoader, showLoader, showModal} from './ui.js';
+import {getAllSpaces, getNextReservations} from './api.js';
 
 // Inicializa a sidebar com base em dados do localStorage
 export function initSidebar() {
@@ -15,12 +15,12 @@ export function initSidebar() {
                 { text: 'Dashboard',     href: 'dashboard.html' },
                 { text: 'Reservas',      href: 'reservations.html'  },
                 { text: 'Espaços Acad.', href: 'spacesAdminOverview.html' },
-                { text: 'Professores',   href: 'professores.html'  },
+                { text: 'Professores',   href: 'users.html'  },
                 { text: 'Configurações', href: 'config.html' }
             ]
             : [
                 { text: 'Início',        href: 'dashboard.html'       },
-                { text: 'Reservas',      href: 'reservations.html' },
+                { text: 'Reservas',      href: 'reservations.html'    },
                 { text: 'Configurações', href: 'config.html'          }
             ];
         menuItems.innerHTML = links
@@ -50,24 +50,24 @@ const token = localStorage.getItem('jwtToken');
 document.addEventListener('DOMContentLoaded', () => {
     initSidebar();
 
+    // carrega cards de próximas reservas
     if (document.getElementById('nextReservations')) {
         loadNextReservations();
     }
 
+    // carrega calendário se existir
     if (document.getElementById('calendarContainer')) {
         loadCalendar();
     }
 
-    const btn = document.getElementById('viewAllSpaces');
-    if (btn) {
-        loadTopSpaces();
-        btn.addEventListener('click', () => {
-            const role = localStorage.getItem('role');
-            window.location.href = role === 'ADMIN'
-                ? 'spaces-admin.html'
-                : 'spaces-user.html';
-        });
+    // setup do botão “Ver todos os espaços”
+    const btnAll = document.getElementById('viewAllSpaces');
+    if (btnAll) {
+        btnAll.addEventListener('click', openAllSpacesModal);
     }
+    document
+        .getElementById('closeAllSpaces')
+        ?.addEventListener('click', closeAllSpacesModal);
 });
 
 async function loadNextReservations() {
@@ -84,10 +84,10 @@ async function loadNextReservations() {
                 const card = document.createElement('div');
                 card.className = 'reserva-card';
                 card.innerHTML = `
-          <div class=\"reserva-badge\">Reservado</div>
-          <div class=\"reserva-data\">${new Date(r.reservationDate).toLocaleDateString()}</div>
-          <div class=\"reserva-espaco\">${r.academicSpaces.name}</div>
-          <div class=\"reserva-horario\">${r.reservationInit.slice(0,5)} - ${r.reservationEnd.slice(0,5)}</div>`;
+          <div class="reserva-badge">Reservado</div>
+          <div class="reserva-data">${new Date(r.reservationDate).toLocaleDateString()}</div>
+          <div class="reserva-espaco">${r.academicSpaces.name}</div>
+          <div class="reserva-horario">${r.reservationInit.slice(0,5)} - ${r.reservationEnd.slice(0,5)}</div>`;
                 container.appendChild(card);
             });
         }
@@ -98,30 +98,55 @@ async function loadNextReservations() {
     }
 }
 
-async function loadTopSpaces() {
-    const list = document.getElementById('topSpacesList');
-    if (!list) return;
-    list.innerHTML = '';
+function loadCalendar() {
+    const container = document.getElementById('calendarContainer');
+    if (!container) return;
+    container.innerHTML = '<p>Calendário será implementado aqui.</p>';
+}
+
+// --------------------------------------------------------
+// Modal “Todos os Espaços” (Ativos / Inativos)
+// --------------------------------------------------------
+
+async function openAllSpacesModal() {
+    const modal         = document.getElementById('allSpacesModal');
+    const activeGrid    = document.getElementById('activeSpacesGrid');
+    const inactiveGrid  = document.getElementById('inactiveSpacesGrid');
+
+    modal.classList.remove('hidden');
     showLoader();
     try {
-        const spaces = await getActiveSpaces(token);
-        spaces
-            .sort((a, b) => (b.reservationsCount || 0) - (a.reservationsCount || 0))
-            .slice(0, 6)
-            .forEach(s => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href=\"space-detail.html?id=${s.id}\">${s.name}</a>`;
-                list.appendChild(li);
-            });
+        const spaces = await getAllSpaces(token);
+        activeGrid.innerHTML   = '';
+        inactiveGrid.innerHTML = '';
+
+        spaces.forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'space-card' + (s.active ? '' : ' inactive');
+            card.textContent = s.name;
+
+            if (!s.active) {
+                card.dataset.reason = s.disableReason || 'Sem motivo informado';
+            }
+
+            (s.active ? activeGrid : inactiveGrid).appendChild(card);
+        });
+
+
+        if (!activeGrid.children.length) {
+            activeGrid.innerHTML = '<p>— nenhum espaço ativo </p>';
+        }
+        if (!inactiveGrid.children.length) {
+            inactiveGrid.innerHTML = '<p>— nenhum espaço inativo </p>';
+        }
     } catch (err) {
-        showModal('Não foi possível carregar espaços: ' + err.message, false);
+        activeGrid.innerHTML   = `<p>Erro: ${err.message}</p>`;
+        inactiveGrid.innerHTML = '';
     } finally {
         hideLoader();
     }
 }
 
-function loadCalendar() {
-    const container = document.getElementById('calendarContainer');
-    if (!container) return;
-    container.innerHTML = '<p>Calendário será implementado aqui.</p>';
+function closeAllSpacesModal() {
+    document.getElementById('allSpacesModal').classList.add('hidden');
 }

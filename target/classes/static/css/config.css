@@ -1,0 +1,30 @@
+/* config.css */
+.profile-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.profile-form .form-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-form label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"] {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.profile-form .actions {
+    text-align: right;
+}

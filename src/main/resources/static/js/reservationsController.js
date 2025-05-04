@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupFormFilters();
     preencherHorarios();
+    setupTimeValidation();       // <-- validação de horário
 });
 
 // monta os 2 ou 3 botões na área central
@@ -52,7 +53,7 @@ function setupButtons() {
     };
 
     container.append(
-        makeGroup('viewMyRes', '👁️', 'Ver minhas reservas', 'minhas-reservas.html'),
+        makeGroup('viewMyRes', '👁️', 'Ver minhas reservas', 'my-reservations.html'),
         makeGroup('newResBtn', '＋', 'Solicitar novas reservas')
     );
     if (role === 'ADMIN') {
@@ -61,7 +62,6 @@ function setupButtons() {
         );
     }
 }
-
 
 // ----------------------------------------------------------------------------
 // Modal: Nova Reserva
@@ -76,7 +76,7 @@ async function openNewResModal() {
         allSpaces = await getAllSpaces(token);
         renderSpaces(allSpaces);
 
-        // validação de data e horário
+        // validação de data e horário mínima
         const dateInput  = document.getElementById('date');
         const startInput = document.getElementById('startTime');
         const endInput   = document.getElementById('endTime');
@@ -99,8 +99,11 @@ async function openNewResModal() {
         dateInput.addEventListener('change', updateMinTimes);
         startInput.addEventListener('change', () => {
             endInput.min = startInput.value;
+            // força revalidação do fim logo ao abrir o modal
+            setupTimeValidation();
         });
         updateMinTimes();
+
     } catch (err) {
         showModal('Erro ao carregar espaços: ' + err.message, false);
     } finally {
@@ -158,7 +161,6 @@ function filterSpaces() {
         if (s.capacity < capVal) return false;
         if (hasComp && !s.hasComputer) return false;
         return !(term && !s.name.toLowerCase().includes(term));
-
     });
     renderSpaces(filtered);
 }
@@ -180,6 +182,32 @@ function preencherHorarios() {
     }
 }
 
+// ----------------------------------------------------------------------------
+// Validação: horário de fim deve ser > início
+// ----------------------------------------------------------------------------
+function setupTimeValidation() {
+    const start = document.getElementById('startTime');
+    const end   = document.getElementById('endTime');
+    if (!start || !end) return;
+
+    start.addEventListener('change', () => {
+        const startVal = start.value;
+        Array.from(end.options).forEach(opt => {
+            if (opt.value === '') {
+                opt.disabled = false;
+                return;
+            }
+            opt.disabled = (opt.value <= startVal);
+        });
+        if (end.value && end.value <= startVal) {
+            end.value = '';
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// Envio do formulário
+// ----------------------------------------------------------------------------
 async function submitReservation() {
     if (!selectedSpace) {
         showModal('Selecione um espaço antes de enviar.', false);
@@ -209,19 +237,15 @@ async function submitReservation() {
         const token = localStorage.getItem('jwtToken');
         await createReservation(payload, token);
 
-        // Fecha o modal e atualiza a lista sem sair da página
         closeNewResModal();
-
-        // Exibe toast de sucesso
         showToast('Reserva criada com sucesso!');
     } catch (err) {
         showModal('Erro ao criar reserva: ' + err.message, false);
     } finally {
         hideLoader();
-        window.location.reload();
-
     }
 }
+
 function resetFormAndSelection() {
     document.getElementById('reservationForm').reset();
     document.getElementById('searchSpace').value = '';

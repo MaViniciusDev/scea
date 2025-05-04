@@ -78,6 +78,7 @@ async function onPasswordSubmit(e) {
         localStorage.setItem('firstName', currentFirstName);
         localStorage.setItem('lastName', currentLastName);
         localStorage.setItem('role', role || 'USER');
+        localStorage.setItem('email', currentEmail);
         window.location.href = 'dashboard.html';
     });
 }

@@ -12,8 +12,6 @@ import {
 import { registerUser } from './api.js';
 
 import {
-    isEmailValid,
-    isPasswordStrong,
     validateRegistration
 } from './validation.js';
 

@@ -46,9 +46,28 @@
     </main>
 </div>
 
+<!-- Modal “Todos os Espaços” -->
+<div id="allSpacesModal" class="modal-overlay hidden">
+    <div class="modal-content-large">
+        <div class="modal-header">
+            <h2>Todos os Espaços Acadêmicos</h2>
+            <button id="closeAllSpaces" class="close-btn">×</button>
+        </div>
+        <div class="modal-body spaces-modal-body">
+            <section>
+                <h3>Ativos</h3>
+                <div id="activeSpacesGrid" class="spaces-grid"></div>
+            </section>
+            <section>
+                <h3>Inativos</h3>
+                <div id="inactiveSpacesGrid" class="spaces-grid"></div>
+            </section>
+        </div>
+    </div>
+</div>
+
 <script type="module" src="../js/ui.js"></script>
 <script type="module" src="../js/api.js"></script>
 <script type="module" src="../js/dashboard.js"></script>
-
 </body>
 </html>

@@ -42,6 +42,11 @@
                 <button id="newResBtn" class="circle-btn">＋</button>
                 <p>Solicitar novas reservas</p>
             </div>
+            <!-- Só para ADMIN -->
+            <div class="action-group">
+                <button id="manageResBtn" class="circle-btn">🛠️</button>
+                <p>Gerenciar reservas</p>
+            </div>
         </div>
     </main>
 </div>
@@ -89,7 +94,6 @@
                         <option value="">Fim</option>
                     </select>
                 </div>
-
             </form>
 
             <!-- Lista de espaços (60%) -->
@@ -104,6 +108,22 @@
         </div>
         <div class="modal-footer">
             <button id="submitReservation" class="btn save-btn">Enviar solicitação</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Gerenciar Reservas -->
+<div id="manageReservationsModal" class="modal-overlay hidden">
+    <div class="modal-content-large reservation-modal">
+        <div class="modal-header">
+            <h2>Gerenciar reservas</h2>
+            <button id="closeManageRes" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+            <input id="manageSearch" type="text" placeholder="🔍 Buscar sala..." class="modal-search" />
+            <ul id="manageSpacesList" class="spaces-grid">
+                <!-- itens serão preenchidos via JS -->
+            </ul>
         </div>
     </div>
 </div>

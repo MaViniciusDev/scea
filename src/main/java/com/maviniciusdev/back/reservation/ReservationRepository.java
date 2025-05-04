@@ -40,4 +40,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
       ORDER BY r.reservationDate
     """)
     List<Reservation> findByProfessorEmail(@Param("email") String email);
+
+    List<Reservation> findByAcademicSpaces_Id(Long spaceId);
 }

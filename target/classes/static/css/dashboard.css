@@ -497,3 +497,163 @@ body {
     font-size: 1rem;
     margin-top: 0.25rem;
 }
+/* === Busca === */
+.manage-menu {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: flex-start;
+}
+#searchProfessor {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* === Lista de usuários/Professores como cards === */
+.users-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #e0e0e5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 1rem;
+
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+}
+
+/* === Select de role === */
+.role-select {
+    margin: 0 0.75rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+/* === Botão de excluir === */
+.btn-delete {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+.btn-delete .icon-trash {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    transition: color 0.2s;
+}
+.btn-delete:hover .icon-trash {
+    color: #c0392b;
+}
+
+/* === Título da página === */
+.content h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #222;
+}
+/* Container do modal */
+.modal-overlay .modal-content-large {
+    width: 90vw;
+    height: 90vw;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    padding: 1.5rem;
+    flex-direction: column;
+
+}
+
+/* Body do modal com duas colunas */
+.spaces-modal-body {
+    display: flex;
+    gap: 2rem;
+}
+
+/* Cada seção */
+.spaces-modal-body section {
+    flex: 1;
+}
+
+/* Títulos de seção */
+.spaces-modal-body h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.25rem;
+}
+
+/* Grid de cards */
+.spaces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+    max-height: none;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    flex: auto;
+}
+
+/* Card de cada espaço */
+.space-card {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.75rem;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow .2s;
+}
+.space-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilo para inativos */
+.space-card.inactive {
+    background: #f5f5f5;
+    color: #777;
+    cursor: help;
+}
+
+/* Tooltip ao dar hover em inativo */
+.space-card.inactive:hover::after {
+    content: attr(data-reason);
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: pre-wrap;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.4rem;
+    z-index: 10;
+    font-size: 0.85rem;
+    max-width: 200px;
+    text-align: left;
+}

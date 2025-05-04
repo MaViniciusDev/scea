@@ -1,4 +1,3 @@
-// api.js
 export const API_BASE = 'http://localhost:8080/api/v1';
 
 // Trata respostas HTTP (apenas lança erro, sem side-effects de autenticação)
@@ -10,7 +9,6 @@ async function handleResponse(resp) {
 }
 
 // === Autenticação e Usuários ===
-/** Verifica existência de usuário por email */
 export async function checkUserExists(email) {
     const resp = await fetch(
         `${API_BASE}/users/exists?email=${encodeURIComponent(email)}`
@@ -19,7 +17,6 @@ export async function checkUserExists(email) {
     return resp.json();
 }
 
-/** Realiza login */
 export async function loginUser(email, senha) {
     const resp = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
@@ -30,7 +27,6 @@ export async function loginUser(email, senha) {
     return resp.json();
 }
 
-/** Registra novo usuário */
 export async function registerUser(data) {
     const resp = await fetch(`${API_BASE}/registration`, {
         method: 'POST',
@@ -40,8 +36,8 @@ export async function registerUser(data) {
     await handleResponse(resp);
     return resp.text();
 }
+
 // === Espaços Acadêmicos ===
-/** Busca espaços ativos */
 export async function getActiveSpaces(token) {
     const resp = await fetch(`${API_BASE}/academic-spaces/active`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -50,16 +46,15 @@ export async function getActiveSpaces(token) {
     return resp.json();
 }
 
-/** Para preencher o grid de Reserva: busca espaços disponíveis (ativos) */
+/** Busca todos os espaços (ativos e inativos) via /all */
 export async function getAllSpaces(token) {
-    const resp = await fetch(`${API_BASE}/academic-spaces/active`, {
+    const resp = await fetch(`${API_BASE}/academic-spaces/all`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     await handleResponse(resp);
     return resp.json();
 }
 
-/** Cria novo espaço acadêmico */
 export async function createSpace(payload, token) {
     const resp = await fetch(`${API_BASE}/academic-spaces/create`, {
         method: 'POST',
@@ -73,7 +68,6 @@ export async function createSpace(payload, token) {
     return resp.json();
 }
 
-/** Atualiza espaço existente */
 export async function updateSpace(id, payload, token) {
     const resp = await fetch(`${API_BASE}/academic-spaces/update/${id}`, {
         method: 'PUT',
@@ -87,7 +81,6 @@ export async function updateSpace(id, payload, token) {
     return resp.json();
 }
 
-/** Exclui espaço por ID */
 export async function deleteSpaceById(id, token) {
     const resp = await fetch(`${API_BASE}/academic-spaces/delete/${id}`, {
         method: 'DELETE',
@@ -97,7 +90,6 @@ export async function deleteSpaceById(id, token) {
 }
 
 // === Reservas ===
-/** Busca próximas reservas do usuário */
 export async function getNextReservations(token) {
     const resp = await fetch(`${API_BASE}/reservations/user`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -106,7 +98,14 @@ export async function getNextReservations(token) {
     return resp.json();
 }
 
-/** Cria nova reserva */
+export async function getUserReservations(token) {
+    const resp = await fetch(`${API_BASE}/reservations/user`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    await handleResponse(resp);
+    return resp.json();
+}
+
 export async function createReservation(payload, token) {
     const resp = await fetch(`${API_BASE}/reservations`, {
         method: 'POST',
@@ -119,7 +118,7 @@ export async function createReservation(payload, token) {
     await handleResponse(resp);
     return resp.json();
 }
-/** Busca todas as reservas de um espaço acadêmico pelo ID */
+
 export async function getReservationsBySpace(spaceId, token) {
     const resp = await fetch(
         `${API_BASE}/reservations/space/${encodeURIComponent(spaceId)}`,
@@ -130,7 +129,7 @@ export async function getReservationsBySpace(spaceId, token) {
     await handleResponse(resp);
     return resp.json();
 }
-/** Exclui uma reserva pelo ID */
+
 export async function deleteReservation(reservationId, token) {
     const resp = await fetch(
         `${API_BASE}/reservations/${encodeURIComponent(reservationId)}`,
@@ -140,6 +139,59 @@ export async function deleteReservation(reservationId, token) {
         }
     );
     await handleResponse(resp);
-    // Se quiser ler a mensagem de confirmação do backend:
+    return resp.text();
+}
+
+// === Professores / Usuários ===
+export async function getAllProfessors(token) {
+    const resp = await fetch(`${API_BASE}/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    await handleResponse(resp);
+    return resp.json();
+}
+
+export async function deleteProfessor(userId, token) {
+    const resp = await fetch(
+        `${API_BASE}/users/${encodeURIComponent(userId)}`,
+        {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        }
+    );
+    await handleResponse(resp);
+    return resp.text();
+}
+
+export async function updateUserRole(userId, newRole, token) {
+    const resp = await fetch(
+        `${API_BASE}/users/${encodeURIComponent(userId)}/role`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: newRole })
+        }
+    );
+    await handleResponse(resp);
+    return resp.json();
+}
+
+export async function promoteProfessor(userId, token) {
+    return updateUserRole(userId, 'ADMIN', token);
+}
+// Atualiza nome e sobrenome do usuário logado
+export async function updateUserProfile(data, token) {
+    const resp = await fetch(`${API_BASE}/users/profile`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    await handleResponse(resp);
+    // ler como texto, porque não há JSON de resposta
     return resp.text();
 }

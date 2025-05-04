@@ -1,8 +1,7 @@
 // reservationsController.js
 import { initSidebar } from './dashboard.js';
-import { showLoader, hideLoader, showModal } from './ui.js';
+import { showLoader, hideLoader, showModal, showToast } from './ui.js';
 import {
-    getNextReservations,
     getAllSpaces,
     createReservation
 } from './api.js';
@@ -15,42 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebar();
     setupButtons();
 
+    // modal de nova reserva
+    document.getElementById('newResBtn')?.addEventListener('click', openNewResModal);
+    document.getElementById('closeNewRes')?.addEventListener('click', closeNewResModal);
+    document.getElementById('submitReservation')?.addEventListener('click', submitReservation);
 
-    // handlers do modal de nova reserva
-    document
-        .getElementById('newResBtn')
-        ?.addEventListener('click', openNewResModal);
-    document
-        .getElementById('closeNewRes')
-        ?.addEventListener('click', closeNewResModal);
-    document
-        .getElementById('submitReservation')
-        ?.addEventListener('click', submitReservation);
+    // redireciona para a página de gerenciamento (sem modal)
+    document.getElementById('manageResBtn')?.addEventListener('click', () => {
+        window.location.href = 'manage-reservations.html';
+    });
+
     setupFormFilters();
     preencherHorarios();
+    setupTimeValidation();       // <-- validação de horário
 });
-function preencherHorarios() {
-    const start = document.getElementById('startTime');
-    const end = document.getElementById('endTime');
-    if (!start || !end) return;
 
-    start.innerHTML = '<option value="">Início</option>';
-    end.innerHTML = '<option value="">Fim</option>';
-
-    for (let h = 6; h <= 23; h++) {
-        for (let m of [0, 30]) {
-            const hh = String(h).padStart(2, '0');
-            const mm = String(m).padStart(2, '0');
-            const val = `${hh}:${mm}`;
-            const opt1 = new Option(val, val);
-            const opt2 = new Option(val, val);
-            start.appendChild(opt1);
-            end.appendChild(opt2);
-        }
-    }
-}
-
-// monta os 2 ou 3 botões na area central
+// monta os 2 ou 3 botões na área central
 function setupButtons() {
     const role = localStorage.getItem('role');
     const container = document.querySelector('.centered-action');
@@ -74,47 +53,20 @@ function setupButtons() {
     };
 
     container.append(
-        makeGroup('viewMyRes', '👁️', 'Ver minhas reservas', 'minhas-reservas.html'),
+        makeGroup('viewMyRes', '👁️', 'Ver minhas reservas', 'my-reservations.html'),
         makeGroup('newResBtn', '＋', 'Solicitar novas reservas')
     );
     if (role === 'ADMIN') {
         container.append(
-            makeGroup('manageResBtn', '🛠️', 'Gerenciar reservas', 'gerenciar-reservas.html')
+            makeGroup('manageResBtn', '🛠️', 'Gerenciar reservas')
         );
     }
 }
 
-// carrega e exibe os cards de próximas reservas
-async function loadNextReservations() {
-    const container = document.getElementById('nextReservations');
-    if (!container) return;
-    container.innerHTML = '';
-    showLoader();
-    try {
-        const token = localStorage.getItem('jwtToken');
-        const reservas = await getNextReservations(token);
-        if (!reservas.length) {
-            container.innerHTML = '<p>Sem próximas reservas.</p>';
-        } else {
-            reservas.slice(0, 5).forEach(r => {
-                const card = document.createElement('div');
-                card.className = 'reserva-card';
-                card.innerHTML = `
-          <div class="reserva-badge">Reservado</div>
-          <div class="reserva-data">${new Date(r.reservationDate).toLocaleDateString()}</div>
-          <div class="reserva-espaco">${r.academicSpaces.name}</div>
-          <div class="reserva-horario">${r.reservationInit.slice(0,5)} - ${r.reservationEnd.slice(0,5)}</div>`;
-                container.appendChild(card);
-            });
-        }
-    } catch (err) {
-        showModal('Erro ao carregar reservas: ' + err.message, false);
-    } finally {
-        hideLoader();
-    }
-}
+// ----------------------------------------------------------------------------
+// Modal: Nova Reserva
+// ----------------------------------------------------------------------------
 
-// abre o modal e carrega todos os espaços
 async function openNewResModal() {
     const modal = document.getElementById('newReservationModal');
     modal.classList.remove('hidden');
@@ -124,7 +76,7 @@ async function openNewResModal() {
         allSpaces = await getAllSpaces(token);
         renderSpaces(allSpaces);
 
-        // === validação de data e horário ===
+        // validação de data e horário mínima
         const dateInput  = document.getElementById('date');
         const startInput = document.getElementById('startTime');
         const endInput   = document.getElementById('endTime');
@@ -147,9 +99,10 @@ async function openNewResModal() {
         dateInput.addEventListener('change', updateMinTimes);
         startInput.addEventListener('change', () => {
             endInput.min = startInput.value;
+            // força revalidação do fim logo ao abrir o modal
+            setupTimeValidation();
         });
         updateMinTimes();
-        // === fim validação ===
 
     } catch (err) {
         showModal('Erro ao carregar espaços: ' + err.message, false);
@@ -158,13 +111,11 @@ async function openNewResModal() {
     }
 }
 
-// fecha modal e limpa estado
 function closeNewResModal() {
     document.getElementById('newReservationModal').classList.add('hidden');
     resetFormAndSelection();
 }
 
-// exibe cards no grid
 function renderSpaces(spaces) {
     const grid = document.getElementById('spacesGrid');
     grid.innerHTML = '';
@@ -177,28 +128,21 @@ function renderSpaces(spaces) {
         card.className = 'reserva-card';
         card.textContent = s.name;
         card.addEventListener('click', () => selectSpace(card, s));
-        if (selectedSpace?.id === s.id) {
-            card.classList.add('selected');
-        }
         grid.appendChild(card);
     });
 }
 
-// marca card selecionado e preenche filtros
 function selectSpace(cardEl, space) {
-    document
-        .querySelectorAll('.spaces-grid .reserva-card.selected')
+    document.querySelectorAll('.spaces-grid .reserva-card.selected')
         .forEach(c => c.classList.remove('selected'));
     cardEl.classList.add('selected');
     selectedSpace = space;
 
-    // preenche o form
     document.getElementById('spaceType').value = space.spaceType;
     document.getElementById('capacity').value  = space.capacity;
     document.getElementById('hasComputer').checked = space.hasComputer;
 }
 
-// configura filtro reativo no form e na busca
 function setupFormFilters() {
     const form = document.getElementById('reservationForm');
     const search = document.getElementById('searchSpace');
@@ -206,7 +150,6 @@ function setupFormFilters() {
     search.addEventListener('input', filterSpaces);
 }
 
-// filtra e rerenderiza cards
 function filterSpaces() {
     const typeVal = document.getElementById('spaceType').value;
     const capVal  = parseInt(document.getElementById('capacity').value) || 0;
@@ -218,12 +161,53 @@ function filterSpaces() {
         if (s.capacity < capVal) return false;
         if (hasComp && !s.hasComputer) return false;
         return !(term && !s.name.toLowerCase().includes(term));
-
     });
     renderSpaces(filtered);
 }
 
-// envia payload de reserva e fecha modal
+function preencherHorarios() {
+    const start = document.getElementById('startTime');
+    const end = document.getElementById('endTime');
+    if (!start || !end) return;
+    start.innerHTML = '<option value="">Início</option>';
+    end.innerHTML = '<option value="">Fim</option>';
+    for (let h = 6; h <= 23; h++) {
+        for (let m of [0, 30]) {
+            const hh = String(h).padStart(2, '0');
+            const mm = String(m).padStart(2, '0');
+            const val = `${hh}:${mm}`;
+            start.appendChild(new Option(val, val));
+            end.appendChild(new Option(val, val));
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Validação: horário de fim deve ser > início
+// ----------------------------------------------------------------------------
+function setupTimeValidation() {
+    const start = document.getElementById('startTime');
+    const end   = document.getElementById('endTime');
+    if (!start || !end) return;
+
+    start.addEventListener('change', () => {
+        const startVal = start.value;
+        Array.from(end.options).forEach(opt => {
+            if (opt.value === '') {
+                opt.disabled = false;
+                return;
+            }
+            opt.disabled = (opt.value <= startVal);
+        });
+        if (end.value && end.value <= startVal) {
+            end.value = '';
+        }
+    });
+}
+
+// ----------------------------------------------------------------------------
+// Envio do formulário
+// ----------------------------------------------------------------------------
 async function submitReservation() {
     if (!selectedSpace) {
         showModal('Selecione um espaço antes de enviar.', false);
@@ -252,9 +236,9 @@ async function submitReservation() {
     try {
         const token = localStorage.getItem('jwtToken');
         await createReservation(payload, token);
-        showModal('Reserva criada com sucesso!', true);
+
         closeNewResModal();
-        loadNextReservations();
+        showToast('Reserva criada com sucesso!');
     } catch (err) {
         showModal('Erro ao criar reserva: ' + err.message, false);
     } finally {
@@ -262,7 +246,6 @@ async function submitReservation() {
     }
 }
 
-// limpa form, busca e seleção
 function resetFormAndSelection() {
     document.getElementById('reservationForm').reset();
     document.getElementById('searchSpace').value = '';

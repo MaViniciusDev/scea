@@ -1,5 +1,7 @@
 package com.maviniciusdev.back.appuser;
 
+import com.maviniciusdev.back.registration.token.ConfirmationToken;
+import com.maviniciusdev.back.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,8 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @Getter
 @Setter
@@ -42,53 +43,57 @@ public class AppUser implements UserDetails {
     private Boolean locked = false;
     private Boolean enabled = false;
 
+
+    @OneToMany(
+            mappedBy = "appUser",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private List<ConfirmationToken> confirmationTokens = new ArrayList<>();
+    @OneToMany(
+            mappedBy = "professor",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private List<Reservation> reservations = new ArrayList<>();
+
+
+
     public AppUser(String firstName,
                    String lastName,
                    String email,
                    String password,
                    AppUserRole appUserRole) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
+        this.firstName   = firstName;
+        this.lastName    = lastName;
+        this.email       = email;
+        this.password    = password;
         this.appUserRole = appUserRole;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Prefixo "ROLE_" é necessário para hasRole("ADMIN") funcionar
         SimpleGrantedAuthority authority =
                 new SimpleGrantedAuthority("ROLE_" + appUserRole.name());
         return Collections.singletonList(authority);
     }
 
-    @Override
-    public String getPassword() {
+    @Override public String getPassword()                 {
         return password;
     }
-
-    @Override
-    public String getUsername() {
+    @Override public String getUsername()                 {
         return email;
     }
-
-    @Override
-    public boolean isAccountNonExpired() {
+    @Override public boolean isAccountNonExpired()        {
         return true;
     }
-
-    @Override
-    public boolean isAccountNonLocked() {
+    @Override public boolean isAccountNonLocked()         {
         return !locked;
     }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
+    @Override public boolean isCredentialsNonExpired()    {
         return true;
     }
-
-    @Override
-    public boolean isEnabled() {
+    @Override public boolean isEnabled()                  {
         return enabled;
     }
 }

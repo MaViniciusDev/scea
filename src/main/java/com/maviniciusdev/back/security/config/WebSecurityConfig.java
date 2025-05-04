@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,52 +22,64 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private final AppUserService appUserService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AppUserService          appUserService;
+    private final BCryptPasswordEncoder   bCryptPasswordEncoder;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtAuthFilter)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthFilter
+    ) throws Exception {
         http
                 .sessionManagement(sess ->
-                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        // Permite recursos estáticos (CSS, JS, imagens)
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        // Permite páginas HTML estáticas
+
+                        // recursos públicos estáticos e html
+                        .requestMatchers(
+                                PathRequest.toStaticResources().atCommonLocations()
+                        ).permitAll()
                         .requestMatchers("/pages/**", "/*.html").permitAll()
-                        // Endpoints abertos de autenticação
+
+                        // endpoints abertos de registro/login
                         .requestMatchers(
                                 "/api/v*/registration/**",
-                                "/api/v1/users/exists",
-                                "/api/v1/auth/login",
-                                "/api/v1/auth/forgot-password",
-                                "/api/v1/auth/confirm-reset",
-                                "/api/v1/auth/reset-password"
+                                "/api/v1/auth/**"
                         ).permitAll()
-                        // Rotas apenas para ADMIN
+
+                        // verifica existência de usuário
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/exists")
+                        .permitAll()
+
+                        // CRUD usuários (só ADMIN)
+                        .requestMatchers(HttpMethod.GET,   "/api/v1/users").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
+
+                        // ALLOW GET em academic-spaces para USER e ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/v1/academic-spaces/**")
+                        .hasAnyRole("USER","ADMIN")
+
+                        // demais ações em academic-spaces só ADMIN
                         .requestMatchers(
                                 "/api/v1/academic-spaces/create",
                                 "/api/v1/academic-spaces/update/**",
                                 "/api/v1/academic-spaces/update-availability/**",
-                                "/api/v1/academic-spaces/delete/**",
-                                "/api/v1/users/**"
+                                "/api/v1/academic-spaces/delete/**"
                         ).hasRole("ADMIN")
-                        // Rotas acessíveis a USER e ADMIN
-                        .requestMatchers(
-                                "/api/v1/reservations/**",
-                                "/api/v1/academic-spaces/available",
-                                "/api/v1/academic-spaces/active",
-                                "/api/v1/academic-spaces/by-code/**"
-                        ).hasAnyRole("USER", "ADMIN")
-                        // Qualquer outra requisição precisa de autenticação
+
+                        // reservas (USER ou ADMIN)
+                        .requestMatchers("/api/v1/reservations/**")
+                        .hasAnyRole("USER","ADMIN")
+
+                        // todo o resto precisa autenticação
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        ;
 
         return http.build();
     }
