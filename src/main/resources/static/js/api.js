@@ -1,4 +1,4 @@
-export const API_BASE = 'http://localhost:8080/api/v1';
+export const API_BASE = '/api/v1';
 
 // Trata respostas HTTP (apenas lança erro, sem side-effects de autenticação)
 async function handleResponse(resp) {
