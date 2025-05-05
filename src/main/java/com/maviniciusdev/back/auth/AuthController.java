@@ -26,10 +26,8 @@ public class AuthController {
     private final PasswordResetService passwordResetService;
     private final PasswordResetTokenRepository tokenRepository;
 
-    private static final String FRONT_LOGIN_URL =
-            "http://localhost:63342/scea/static/pages/index.html";
-    private static final String FRONT_RESET_PAGE =
-            "http://localhost:63342/scea/static/pages/reset-password.html";
+    private static final String FRONT_LOGIN_URL = "/pages/index.html";
+    private static final String FRONT_RESET_PAGE = "/pages/reset-password.html";
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> loginRequest) {

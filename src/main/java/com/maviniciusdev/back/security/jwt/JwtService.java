@@ -13,10 +13,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "irineuvocenaosabeenemeujwtsecuritykey";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60;
-
     private Key getSignKey() {
+        String SECRET_KEY = "irineuvocenaosabeenemeujwtsecuritykey";
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
@@ -51,6 +49,7 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        long EXPIRATION_TIME = 1000 * 60 * 60;
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)

@@ -21,9 +21,8 @@ public class PasswordResetService {
     @Value("${app.password.reset.token.expiration.minutes:60}")
     private long expirationMinutes;
 
-    // Endpoint de confirmação pelo back-end
-    private static final String CONFIRM_RESET_ENDPOINT =
-            "http://localhost:8080/api/v1/auth/confirm-reset";
+    // Endpoint de confirmação pelo back-end, relativo
+    private static final String CONFIRM_RESET_ENDPOINT = "/api/v1/auth/confirm-reset";
 
     @Transactional
     public void createResetToken(String email) {
@@ -73,24 +72,20 @@ public class PasswordResetService {
                 "    <tr>" +
                 "      <td style=\"padding:30px;text-align:center;\">" +
                 "        <p style=\"font-size:16px;color:#333;" +
-                "line-height:1.5;\">" +
-                "Clique no botão abaixo para confirmar o pedido de redefinição de senha. Este link expira em "
-                + expirationMinutes + " minutos." +
-                "        </p>" +
+                "line-height:1.5;\">Clique no botão abaixo para confirmar o pedido de redefinição de senha. Este link expira em "
+                + expirationMinutes + " minutos.</p>" +
                 "        <div style=\"margin-top:30px;\">" +
                 "          <a href=\"" + link + "\" " +
                 "style=\"background:#a3b2ff;color:#000;" +
                 "text-decoration:none;padding:12px 24px;border-radius:6px;" +
-                "font-weight:bold;font-size:16px;display:inline-block;\">" +
-                "Confirmar Redefinição" +
-                "          </a>" +
+                "font-weight:bold;font-size:16px;display:inline-block;\">Confirmar Redefinição</a>" +
                 "        </div>" +
                 "      </td>" +
                 "    </tr>" +
                 "    <tr>" +
                 "      <td style=\"background:#f6f6f6;" +
                 "text-align:center;padding:20px;font-size:14px;color:#999;\">" +
-                "        <p style=\"margin:0;\">AEUCSAL &copy; 2025 — Todos os direitos reservados</p>" +
+                "<p style=\"margin:0;\">AEUCSAL &copy; 2025 — Todos os direitos reservados</p>" +
                 "      </td>" +
                 "    </tr>" +
                 "  </table>" +
