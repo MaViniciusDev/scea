@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scea-app
+  namespace: scea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scea-app
+  template:
+    metadata:
+      labels:
+        app: scea-app
+    spec:
+      containers:
+        - name: backend
+          image: mavigo/scea:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://scea-db:5432/scea
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef: { name: scea-db-secret, key: POSTGRES_USER }
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: scea-db-secret, key: POSTGRES_PASSWORD }
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: create-drop
+            - name: SPRING_MAIL_HOST
+              value: smtp.gmail.com
+            - name: SPRING_MAIL_PORT
+              value: "587"
+            - name: SPRING_MAIL_USERNAME
+              valueFrom:
+                secretKeyRef: { name: scea-mail-secret, key: SPRING_MAIL_USERNAME }
+            - name: SPRING_MAIL_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: scea-mail-secret, key: SPRING_MAIL_PASSWORD }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scea-app
+  namespace: scea
+spec:
+  type: NodePort
+  selector:
+    app: scea-app
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080

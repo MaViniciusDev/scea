@@ -36,7 +36,29 @@
         <div id="nextReservations" class="cards-container"></div>
 
         <section class="bottom-widgets">
-            <div class="calendar-widget" id="calendarContainer"></div>
+            <!-- CALENDÁRIO -->
+            <section class="calendar-widget" id="calendarContainer">
+                <header class="calendar-header">
+                    <button class="prev-month">&lt;</button>
+                    <h2 class="month-name"></h2>
+                    <button class="next-month">&gt;</button>
+                </header>
+                <div class="calendar-body">
+                    <div class="week-days">
+                        <div>D</div><div>S</div><div>T</div><div>Q</div>
+                        <div>Q</div><div>S</div><div>S</div>
+                    </div>
+                    <div class="days-grid"></div>
+                </div>
+                <footer class="calendar-footer">
+                    <div class="reservations-count">
+                        <span class="count-number">0</span>
+                        <span class="count-label">reservas</span>
+                    </div>
+                </footer>
+            </section>
+
+            <!-- TOP ESPAÇOS -->
             <div class="top-spaces-widget">
                 <h2>Espaços mais reservados</h2>
                 <ul id="topSpacesList"></ul>

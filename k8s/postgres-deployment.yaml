@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scea-db
+  namespace: scea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scea-db
+  template:
+    metadata:
+      labels:
+        app: scea-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14-alpine
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef: { name: scea-db-secret, key: POSTGRES_DB }
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: { name: scea-db-secret, key: POSTGRES_USER }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: scea-db-secret, key: POSTGRES_PASSWORD }
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-storage
+          persistentVolumeClaim:
+            claimName: scea-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scea-db
+  namespace: scea
+spec:
+  selector:
+    app: scea-db
+  ports:
+    - port: 5432
+      targetPort: 5432

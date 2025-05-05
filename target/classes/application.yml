@@ -6,24 +6,26 @@ server:
 spring:
   application:
     name: back
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/scea
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://db:5432/scea
+    username: ${SPRING_DATASOURCE_USERNAME:mavigo}
+    password: ${SPRING_DATASOURCE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
+
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ucsalscea@gmail.com
-    password: aiuv yvmt ftoh gdos
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:ucsalscea@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:aiuv yvmt ftoh gdos}
     protocol: smtp
     properties:
       mail:
@@ -35,4 +37,3 @@ spring:
           connectiontimeout: 500000
           timeout: 500000
           writetimeout: 500000
-

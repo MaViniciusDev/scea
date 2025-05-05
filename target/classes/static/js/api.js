@@ -181,16 +181,17 @@ export async function updateUserRole(userId, newRole, token) {
 export async function promoteProfessor(userId, token) {
     return updateUserRole(userId, 'ADMIN', token);
 }
-//Atualiza nome e sobrenome do usuário logado
+// Atualiza nome e sobrenome do usuário logado
 export async function updateUserProfile(data, token) {
     const resp = await fetch(`${API_BASE}/users/profile`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type':  'application/json'
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
     });
     await handleResponse(resp);
-    return resp.json();
+    // ler como texto, porque não há JSON de resposta
+    return resp.text();
 }

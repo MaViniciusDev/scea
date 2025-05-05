@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: scea
+      POSTGRES_USER: mavigo
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+        SPRING_PROFILES_ACTIVE: docker
+        SPRING_APPLICATION_NAME: back
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+        SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+        SPRING_JPA_PROPERTIES_HIBERNATE_SHOW_SQL: true
+        SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/scea
+        SPRING_DATASOURCE_USERNAME: mavigo
+        SPRING_DATASOURCE_PASSWORD: admin
+        SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+        SPRING_MAIL_HOST: smtp.gmail.com
+        SPRING_MAIL_PORT: 587
+        SPRING_MAIL_USERNAME: ucsalscea@gmail.com
+        SPRING_MAIL_PASSWORD: aiuv yvmt ftoh gdos
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
